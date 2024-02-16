@@ -3,9 +3,14 @@
 import { redirect } from 'next/navigation';
 
 const { prisma } = require('../../prisma/client');
-export async function handleSubmitAction(formData) {
+export async function handleSubmitAction(currentState, formData) {
     const title = formData.get('title');
     const code = formData.get('code');
+    if (!title || !code) {
+        return {
+            message: 'Title and Code are required',
+        };
+    }
     const savedcodeBin = await prisma.codeBin.create({
         data: {
             title: title,

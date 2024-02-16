@@ -3,6 +3,7 @@ import { prisma } from '../../prisma/client';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { deleteBinAction } from './actions';
 
+
 export default async function Home() {
     const codeBins = await prisma.codeBin.findMany();
     return (
