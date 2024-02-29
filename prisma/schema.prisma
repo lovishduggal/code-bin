@@ -14,4 +14,7 @@ model CodeBin{
   id Int @id @default(autoincrement())
   title String
   code String
+  userId String
 }
+
+//* To convert the above modal into table we will use npx prisma db push

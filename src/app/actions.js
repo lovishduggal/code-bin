@@ -1,23 +1,33 @@
 'use server';
-
+import { currentUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 
 const { prisma } = require('../../prisma/client');
 export async function handleSubmitAction(currentState, formData) {
-    const title = formData.get('title');
-    const code = formData.get('code');
-    if (!title || !code) {
+    try {
+        const user = await currentUser();
+        const title = formData.get('title');
+        const code = formData.get('code');
+        if (!user) throw new Error('You must be signed in to create bin');
+        if (!title || !code) {
+            return {
+                message: 'Title and Code are required',
+            };
+        }
+        const savedcodeBin = await prisma.codeBin.create({
+            data: {
+                title: title,
+                code: code,
+                userId: user.id,
+            },
+        });
+        console.log(savedcodeBin);
+    } catch (error) {
+        console.log(error);
         return {
-            message: 'Title and Code are required',
+            message: error?.message || 'Something went wrong',
         };
     }
-    const savedcodeBin = await prisma.codeBin.create({
-        data: {
-            title: title,
-            code: code,
-        },
-    });
-    console.log(savedcodeBin);
     redirect('/');
 }
 

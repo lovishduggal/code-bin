@@ -2,10 +2,11 @@ import Link from 'next/link';
 import { prisma } from '../../prisma/client';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { deleteBinAction } from './actions';
-
+import { currentUser } from '@clerk/nextjs';
 
 export default async function Home() {
     const codeBins = await prisma.codeBin.findMany();
+    const user = await currentUser();
     return (
         <div className="mt-3">
             {codeBins.length === 0 && (
@@ -21,13 +22,15 @@ export default async function Home() {
                             className="text-lg font-semibold">
                             {item.title}
                         </Link>
-                        <form action={deleteBinAction.bind(null, item.id)}>
-                            <button
-                                type="submit"
-                                className="hover:cursor-pointer">
-                                <TrashIcon className="h-6 w-6 text-rose-600" />
-                            </button>
-                        </form>
+                        {user && item.userId === user.id && (
+                            <form action={deleteBinAction.bind(null, item.id)}>
+                                <button
+                                    type="submit"
+                                    className="hover:cursor-pointer">
+                                    <TrashIcon className="h-6 w-6 text-rose-600" />
+                                </button>
+                            </form>
+                        )}
                     </div>
                 );
             })}
